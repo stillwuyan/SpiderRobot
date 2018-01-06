@@ -1,0 +1,16 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+"146508e" = {path = ".\\Twisted-17.9.0-cp36-cp36m-win_amd64.whl"}
+scrapy = "*"
+"pypiwin32" = "*"
+
+
+[dev-packages]
+
