@@ -1,4 +1,4 @@
-# Initialize project
+# Initialize spider project
 1. Create workspace directory
   ```
   mkdir spider
@@ -58,6 +58,8 @@
    ```
 
 
-# Use http server
+# Create http server
 
 + `python -m http.server 8000`
++ `python -m webbrowser -t "http://localhost:8000"`
+
