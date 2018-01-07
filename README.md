@@ -30,7 +30,7 @@
    1. Crawl `http://www.zimuku.cn` with movie name
 
       ```
-      scrapy crawl zimuku -a movie='intern'
+      scrapy crawl -a movie='intern' zimuku
       ```
 
    2. Crawl `http://www.zimuku.cn` for test

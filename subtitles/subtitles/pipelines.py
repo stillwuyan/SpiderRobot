@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 
 # Define your item pipelines here
 #
@@ -7,5 +8,15 @@
 
 
 class SubtitlesPipeline(object):
+    @classmethod
+    def from_crawler(cls, crawler):
+        file = crawler.settings.get('file')
+        return cls(file)
+
+    def __init__(self, file):
+        self.file = file if file is not None else 'subtitles.json'
+
     def process_item(self, item, spider):
+        with open(self.file, 'a', encoding='utf-8') as f:
+            f.write(json.dumps(dict(item), ensure_ascii=False) + '\n')
         return item
