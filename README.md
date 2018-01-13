@@ -16,6 +16,7 @@
   pipenv install ./Twisted-17.9.0-cp36-cp36m-win_amd64.whl
   pipenv install scrapy
   pipenv install pypiwin32
+  pipenv install patool
   ```
 
 4. Create spider project
@@ -42,7 +43,7 @@
 5. Run python script file
 
    ```
-   pipenv run python script.py
+   pipenv run python run.py
    ```
 
 6. Install from the Pipfile.lock

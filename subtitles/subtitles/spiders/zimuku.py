@@ -25,5 +25,6 @@ class ZimukuSpider(scrapy.Spider):
         item['lang'] = response.xpath('//ul[@class="subinfo clearfix"]/li[1]/img/@alt').extract()
         item['type'] = response.xpath('//ul[@class="subinfo clearfix"]/li[2]/span/text()').extract()
         item['download_number'] = response.xpath('//ul[@class="subinfo clearfix"]/li[3]/text()').extract()
-        item['download_url'] = response.xpath('//ul[@class="subinfo clearfix"]/li[last()]/div/a[@id="down1"]/@href').extract()
+        url_list = response.xpath('//ul[@class="subinfo clearfix"]/li[last()]/div/a[@id="down1"]/@href').extract()
+        item['download_url'] = list(map(lambda url: 'http://' + self.allowed_domains[0] + url, url_list))
         yield item

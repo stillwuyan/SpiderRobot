@@ -8,6 +8,7 @@ function list_movies(movies) {
 }
 
 window.onload = function () {
+  // TODO: use fetch to replace ajax
   var request = new XMLHttpRequest();
   request.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
