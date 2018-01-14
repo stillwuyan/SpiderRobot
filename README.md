@@ -28,10 +28,10 @@
    scrapy genspider zimuku www.zimuku.cn
    ```
 
-   1. Crawl `http://www.zimuku.cn` with movie name
+   1. Crawl `http://www.zimuku.cn` with movie name and output file name
 
       ```
-      scrapy crawl -a movie='intern' zimuku
+      scrapy crawl -a movie='intern' -s file='subtitles.json' zimuku
       ```
 
    2. Crawl `http://www.zimuku.cn` for test
