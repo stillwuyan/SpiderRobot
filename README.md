@@ -64,3 +64,23 @@
 + `python -m http.server 8000`
 + `python -m webbrowser -t "http://localhost:8000"`
 
+# Setup ESLint for Sublime Text 3
+
++ Install nodejs and ESLint
+   ```
+   npm install -g eslint babel-eslint
+   ```
+
++ Install SublimeLinter and SublimeLinter-eslint on Sublime Text
+   1. `Ctrl+Shift+P`
+   2. Input `Install Package`
+   3. Input `SublimeLinter` and press `Enter`
+   4. `Ctrl+Shift+P`
+   5. Input `Install Package`
+   6. Input `SublimeLinter-eslint` and press `Enter`
+
++ Initialize eslintrc file in the project
+   ```
+   cd ${PROJECT_PATH}
+   eslint --init
+   ```

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from http.server import BaseHTTPRequestHandler
+from urllib.parse import urlparse   #, parse_qs
 import os
 import json
 
@@ -26,15 +27,22 @@ class LocalRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(f.read())
 
     def do_GET(self):
+        path = urlparse(self.path).path
         root = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'public')
-        if self.path == '/':
+        if path == '/':
             filename = root + '/index.html'
             self._send_file(filename)
-        elif self.path == '/movies':
+        elif path == '/movies':
             self._set_headers()
             movie_list = os.listdir(self.movies_path)
             movie_list = list(filter(lambda x: not x.endswith(self.ext_list), movie_list))
             self.wfile.write(json.dumps(movie_list).encode(encoding='utf-8'))
+        elif path == '/query':
+            query = urlparse(self.path).query
+            query_dict = dict(q.split('=') for q in query.split('&'))   # { 'key' : 'value' }
+            # Or use parse_qs
+            # query_dict = parse_qs(query)                              # { 'key' : ['value'] }
+            print(urlparse(self.path))
         else:
             filename = root + self.path
             self._send_file(filename)

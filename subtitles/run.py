@@ -54,14 +54,14 @@ def download_package(url, path):
     return file_path
 
 if __name__ == '__main__':
-    # run_web_server()
+    run_web_server()
     # print(sys.argv[1:])
     #argv = ['movie=intern', 'file=subtitles.json']
     #run_crawler(argv)
-    subtitle_list = []
-    with open('subtitles.json', 'r', encoding='utf-8') as f:
-        for line in f:
-            subtitle_list.append(json.loads(line))
-    file_path = download_package(subtitle_list[0]['download_url'][0], './')
-    if file_path.endswith(('zip', 'rar')):
-        patoolib.extract_archive(file_path, outdir='./tmp')
+    # subtitle_list = []
+    # with open('subtitles.json', 'r', encoding='utf-8') as f:
+    #     for line in f:
+    #         subtitle_list.append(json.loads(line))
+    # file_path = download_package(subtitle_list[0]['download_url'][0], './')
+    # if file_path.endswith(('zip', 'rar')):
+    #     patoolib.extract_archive(file_path, outdir='./tmp')
