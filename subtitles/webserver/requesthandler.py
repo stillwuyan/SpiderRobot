@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from http.server import BaseHTTPRequestHandler
-from urllib.parse import urlparse   #, parse_qs
+from urllib.parse import urlparse, unquote#, parse_qs
 import os
 import json
 
 class LocalRequestHandler(BaseHTTPRequestHandler):
-    movies_path = "J:/Download"
-    ext_list = ('.srt', '.ass', '.mta', '.db')
+    root_path = "J:/Download/"
+    current_path = root_path
+    ext_list = ('.mta', '.db')
     def _set_headers(self, content_type='application/json'):
         self.send_response(200)
         self.send_header('Content-type', content_type)
@@ -26,6 +27,16 @@ class LocalRequestHandler(BaseHTTPRequestHandler):
         with open(filename, 'rb') as f:
             self.wfile.write(f.read())
 
+    def _send_filelist(self, path):
+        self._set_headers()
+        file_list = os.listdir(path)
+        file_list = list(filter(lambda x: not x.endswith(self.ext_list), file_list))
+        response = {
+            'type': 'folder',
+            'data': file_list
+        }
+        self.wfile.write(json.dumps(response).encode(encoding='utf-8'))
+
     def do_GET(self):
         path = urlparse(self.path).path
         root = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'public')
@@ -33,16 +44,30 @@ class LocalRequestHandler(BaseHTTPRequestHandler):
             filename = root + '/index.html'
             self._send_file(filename)
         elif path == '/movies':
-            self._set_headers()
-            movie_list = os.listdir(self.movies_path)
-            movie_list = list(filter(lambda x: not x.endswith(self.ext_list), movie_list))
-            self.wfile.write(json.dumps(movie_list).encode(encoding='utf-8'))
+            self._send_filelist(self.root_path)
         elif path == '/query':
             query = urlparse(self.path).query
             query_dict = dict(q.split('=') for q in query.split('&'))   # { 'key' : 'value' }
             # Or use parse_qs
             # query_dict = parse_qs(query)                              # { 'key' : ['value'] }
-            print(urlparse(self.path))
+            file = self.current_path + unquote(query_dict['movie'], encoding='utf-8')
+            if os.path.isdir(file):
+                self.current_path = file + '/'
+                self._send_filelist(file)
+            elif os.path.isfile(file):
+                self._set_headers()
+                response = {
+                    'type': 'message',
+                    'data': 'this is a file: %s' % file
+                }
+                self.wfile.write(json.dumps(response).encode(encoding='utf-8'))
+            else:
+                self._set_headers()
+                response = {
+                    'type': 'message',
+                    'data': 'unknown file type: %s' % file
+                }
+                self.wfile.write(json.dumps(response).encode(encoding='utf-8'))
         else:
             filename = root + self.path
             self._send_file(filename)

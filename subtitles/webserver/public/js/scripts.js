@@ -1,7 +1,25 @@
 (() => {
+  function handle_response(responseText) {
+    let response = JSON.parse(responseText)
+    switch (response.type) {
+    case 'folder':
+      list_movies(response.data)
+      break
+    case 'file':
+      document.getElementsByTagName('body')[0].innerHTML = responseText
+      break
+    case 'message':
+      document.getElementsByTagName('body')[0].innerHTML = responseText
+      break
+    default:
+      console.log('unknown response data type: ${response.type}')
+    }
+  }
+
   function list_movies(movies) {
     let list = document.getElementById('movie_list')
-    for (var i = 0; i < movies.length; i++) {
+    list.innerHTML = ''
+    for (let i = 0; i < movies.length; i++) {
       let item = document.createElement('li')
       let link = document.createElement('a')
       link.setAttribute('href', 'javascript:void(0)')
@@ -17,8 +35,7 @@
     request.onload = () => {
       // request.readyState will be 4
       if (request.status == 200) {
-        document.innerText = 'Hello world'
-        alert(event)
+        handle_response(request.responseText)
       }
     }
     let name = event.target.innerText
@@ -33,7 +50,7 @@
     request.onload = () => {
       // this.readyState will be 4
       if (request.status == 200) {
-        list_movies(JSON.parse(request.responseText))
+        handle_response(request.responseText)
       }
     }
     request.open('GET', '/movies', true)
