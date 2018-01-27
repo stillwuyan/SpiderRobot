@@ -3,11 +3,13 @@ from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, unquote#, parse_qs
 import os
 import json
+import utils
 
 class LocalRequestHandler(BaseHTTPRequestHandler):
-    root_path = "J:/Download/"
-    current_path = root_path
-    ext_list = ('.mta', '.db')
+    movie_root_path = 'J:/Download'
+    movie_current_path = movie_root_path + '/'
+    ext_list = ('.mta', '.db', 'nfo')
+
     def _set_headers(self, content_type='application/json'):
         self.send_response(200)
         self.send_header('Content-type', content_type)
@@ -33,7 +35,24 @@ class LocalRequestHandler(BaseHTTPRequestHandler):
         file_list = list(filter(lambda x: not x.endswith(self.ext_list), file_list))
         response = {
             'type': 'folder',
+            'path': path,
             'data': file_list
+        }
+        self.wfile.write(json.dumps(response).encode(encoding='utf-8'))
+
+    def _send_subtitles(self, movie):
+        self._set_headers()
+        file = 'tmp/movie.json'
+        if os.path.exists(file):
+            os.remove(file)
+        utils.run_crawler(movie, file)
+        subtile_list = []
+        with open(file, 'r', encoding='utf-8') as f:
+            for line in f:
+                subtile_list.append(json.loads(line))
+        response = {
+            'type': 'subtitles',
+            'data': subtile_list
         }
         self.wfile.write(json.dumps(response).encode(encoding='utf-8'))
 
@@ -43,24 +62,27 @@ class LocalRequestHandler(BaseHTTPRequestHandler):
         if path == '/':
             filename = root + '/index.html'
             self._send_file(filename)
-        elif path == '/movies':
-            self._send_filelist(self.root_path)
+        elif path == '/home':
+            # If we try to change class variable using object, a new instance (or non-static) variable
+            # for that particular object is created and this variable shadows the class variables.
+            #self.movie_current_path = self.movie_root_path + '/'
+            LocalRequestHandler.movie_current_path = self.movie_root_path + '/'
+            self._send_filelist(self.movie_root_path)
         elif path == '/query':
             query = urlparse(self.path).query
             query_dict = dict(q.split('=') for q in query.split('&'))   # { 'key' : 'value' }
             # Or use parse_qs
-            # query_dict = parse_qs(query)                              # { 'key' : ['value'] }
-            file = self.current_path + unquote(query_dict['movie'], encoding='utf-8')
+            #query_dict = parse_qs(query)                               # { 'key' : ['value'] }
+            file = self.movie_current_path + unquote(query_dict['movie'], encoding='utf-8')
             if os.path.isdir(file):
-                self.current_path = file + '/'
+                # If we try to change class variable using object, a new instance (or non-static) variable
+                # for that particular object is created and this variable shadows the class variables.
+                #self.movie_current_path = file + '/'
+                LocalRequestHandler.movie_current_path = file + '/'
                 self._send_filelist(file)
             elif os.path.isfile(file):
-                self._set_headers()
-                response = {
-                    'type': 'message',
-                    'data': 'this is a file: %s' % file
-                }
-                self.wfile.write(json.dumps(response).encode(encoding='utf-8'))
+                movie = utils.parse_movie(unquote(query_dict['movie'], encoding='utf-8'))
+                self._send_subtitles(movie)
             else:
                 self._set_headers()
                 response = {
